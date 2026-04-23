@@ -4,3 +4,11 @@
 # database files
 *.sqlite3
 *.db
+
+**/*.pyc
+.idea/*
+**/__pycache__/*.pyc
+**/*.db
+
+**/*media/*
+**/populate_db.py
