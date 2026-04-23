@@ -1,9 +1,9 @@
 # To run the app
-# pip install "fastapi[standard]"
-# (for dev env with auto load and debug)
-# fastapi dev main.py
+pip install "fastapi[standard]"
+# for dev env with autoload and debug
+fastapi dev main.py
 # (for prod setup more optimised and fast)
-# fastapi run main.py
+fastapi run main.py
 # to work with async await need to install
 # pip install aiosqlite
 # pip install greenlet
@@ -17,8 +17,8 @@ pip install pydantic-settings
 # Part 12 Image upload
 pip install pillow
 
-# Part 15 Password reset
-# for async in place of smtplib to work with async
+# Part 14 Password reset
+# for async in place of smtplib to work with async to send email
 pip install aiosmtplib
 
 # to test dummy email sender
@@ -26,3 +26,91 @@ logon to https://mailtrap.io/
 > create account
 > and get email username and pass
 > then put those in configuration to test
+
+# Part 15 Making database production ready, use postgresql instead of sqlite
+# and use alembic for database migration
+
+# psycopg modern driver to connect with postgresql
+pip install "psycopg[binary]"
+
+# creating and install postgres using aws RDS here for now
+# Steps to create rds instance postgres engine
+# START
+Go to VPC → Subnets
+Filter by VPC = the SAME VPC you’ll use
+✅ Public subnet checklist:
+Route table has:
+0.0.0.0/0 → igw-xxxx
+
+Pick 2 subnets in different AZs
+Example:
+subnet-111 (ap-south-1a)
+subnet-222 (ap-south-1b)
+
+RDS → Subnet groups → Create
+Name fastapi-public-subnet-group
+VPC✅ SAME VPC as subnets
+Subnets ✅ Only PUBLIC subnets
+AZs✅ At least 2
+
+RDS → Create Database
+Public access ✅ YES
+Subnet group ✅ fastapi-public-subnet-group
+Security group ✅ allow 5432
+
+Step 5: Security Group inbound
+PostgreSQL 5432 My IP
+Then test connection with test db DONE!
+# END
+
+# using alembic for database migration
+pip install alembic
+
+# -t async : to use async template and alembic_dir: directory of migrations
+alembic init -t async alembic_dir
+
+# set the Config at alembic files to configure alembic
+# then run to generate alembic config
+alembic revision --autogenerate -m "Creating initial schema"
+# should generate the schema and version file inside alembic dir
+
+# NOT RUN for deleting postgres public schema and create from scratch
+psql
+
+# to apply generated alembic config and create db
+alembic upgrade head
+
+# to check where alembic head is like gitlog
+alembic current
+
+# after adding likes to post schema
+alembic revision --autogenerate -m "Added likes field to post schema"
+alembic upgrade head
+alembic current
+alembic history
+
+# in case of any issue, can roll back to previous version
+alembic downgrade -1
+# then after fixing upgrade head again
+
+# Part 16 Uploading files i.e. Profile pics to AWS S3 bucket using boto3
+#TODO in branch dev_fastapi we have code for part 15
+# currently we are using local database from part 14 for testing later we merge that code.
+
+pip install boto3
+pip freeze > requirements.txt
+
+S3 console > create bucket > uncheck block all public access (ACL top two can be checked)
+> permissions > paste bucket policy GetObject to profile_pics/* dir
+
+IAM console > Policies > create policy > paste policy put and delete object from that
+bucket profile pics dir (least privilege) give any  name FastAPIBlogS3Policy and save
+
+IAM User > create user > set permission >
+'Attach policies directly' FastAPIBlogS3Policy policy > create
+(If using on aws ecosystem IAM role also will work and app get the cred from roles)
+
+In the created user > security credentials > create access keys and save
+we will use that later in config, after that
+
+# Now we change the code
