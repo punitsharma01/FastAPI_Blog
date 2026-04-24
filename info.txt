@@ -114,3 +114,7 @@ In the created user > security credentials > create access keys and save
 we will use that later in config, after that
 
 # Now we change the code
+
+# Part 17 Testing the APIs
+pip install pytest
+pip freeze
