@@ -118,3 +118,4 @@ we will use that later in config, after that
 # Part 17 Testing the APIs
 pip install pytest
 pip freeze
+conftest.py pytest automatically detects
