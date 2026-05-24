@@ -12,3 +12,9 @@
 **/*media/*
 **/populate_db.py
 **/alembic_dir/versions/*
+**/*.pyc
+.idea/*
+**/__pycache__/*.pyc
+**/*.db
+
+**/*media/*

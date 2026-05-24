@@ -35,6 +35,10 @@ pip install "psycopg[binary]"
 
 # creating and install postgres using aws RDS here for now
 # Steps to create rds instance postgres engine
+<<<<<<< HEAD
+=======
+# START
+>>>>>>> files_to_s3
 Go to VPC → Subnets
 Filter by VPC = the SAME VPC you’ll use
 ✅ Public subnet checklist:
@@ -60,7 +64,11 @@ Security group ✅ allow 5432
 Step 5: Security Group inbound
 PostgreSQL 5432 My IP
 Then test connection with test db DONE!
+<<<<<<< HEAD
 
+=======
+# END
+>>>>>>> files_to_s3
 
 # using alembic for database migration
 pip install alembic
@@ -90,5 +98,31 @@ alembic history
 
 # in case of any issue, can roll back to previous version
 alembic downgrade -1
+<<<<<<< HEAD
 
 # then after fixing upgrade head again
+=======
+# then after fixing upgrade head again
+
+# Part 16 Uploading files i.e. Profile pics to AWS S3 bucket using boto3
+#TODO in branch dev_fastapi we have code for part 15
+# currently we are using local database from part 14 for testing later we merge that code.
+
+pip install boto3
+pip freeze > requirements.txt
+
+S3 console > create bucket > uncheck block all public access (ACL top two can be checked)
+> permissions > paste bucket policy GetObject to profile_pics/* dir
+
+IAM console > Policies > create policy > paste policy put and delete object from that
+bucket profile pics dir (least privilege) give any  name FastAPIBlogS3Policy and save
+
+IAM User > create user > set permission >
+'Attach policies directly' FastAPIBlogS3Policy policy > create
+(If using on aws ecosystem IAM role also will work and app get the cred from roles)
+
+In the created user > security credentials > create access keys and save
+we will use that later in config, after that
+
+# Now we change the code
+>>>>>>> files_to_s3

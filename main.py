@@ -18,6 +18,7 @@ from database import engine, get_db
 from routers import posts, users
 from config import settings
 
+
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
 
@@ -29,7 +30,8 @@ async def lifespan(_app: FastAPI):
 app = FastAPI(lifespan=lifespan)
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
-app.mount("/media", StaticFiles(directory="media"), name="media")
+# removed when app is using S3 to upload profile pics
+# app.mount("/media", StaticFiles(directory="media"), name="media")
 
 templates = Jinja2Templates(directory="templates")
 
@@ -37,7 +39,7 @@ app.include_router(users.router, prefix="/api/users", tags=["users"])
 app.include_router(posts.router, prefix="/api/posts", tags=["posts"])
 
 
-## home route - paginated
+# home route - paginated
 @app.get("/", name="home")
 @app.get("/posts", include_in_schema=False, name="posts")
 async def home(request: Request, db: Annotated[AsyncSession, Depends(get_db)]):
@@ -65,6 +67,7 @@ async def home(request: Request, db: Annotated[AsyncSession, Depends(get_db)]):
         },
     )
 
+
 @app.get("/posts/{post_id}", include_in_schema=False)
 async def post_page(
     request: Request,
@@ -87,7 +90,7 @@ async def post_page(
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Post not found")
 
 
-## user_posts_page route - paginated
+# user_posts_page route - paginated
 @app.get("/users/{user_id}/posts", include_in_schema=False, name="user_posts")
 async def user_posts_page(
     request: Request,
@@ -150,6 +153,7 @@ async def register_page(request: Request):
         {"title": "Register"},
     )
 
+
 @app.get("/account", include_in_schema=False)
 async def account_page(request: Request):
     return templates.TemplateResponse(
@@ -159,7 +163,7 @@ async def account_page(request: Request):
     )
 
 
-## for forgot password and password reset routes
+# for forgot password and password reset routes
 @app.get("/forgot-password", include_in_schema=False)
 async def forgot_password_page(request: Request):
     return templates.TemplateResponse(
@@ -182,6 +186,7 @@ async def reset_password_page(request: Request):
 # routes for API in routes users.py
 
 # routes for Posts in posts.py
+
 
 # Exception Handlers
 @app.exception_handler(StarletteHTTPException)
