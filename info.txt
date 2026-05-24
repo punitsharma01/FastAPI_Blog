@@ -35,10 +35,8 @@ pip install "psycopg[binary]"
 
 # creating and install postgres using aws RDS here for now
 # Steps to create rds instance postgres engine
-<<<<<<< HEAD
-=======
+
 # START
->>>>>>> files_to_s3
 Go to VPC → Subnets
 Filter by VPC = the SAME VPC you’ll use
 ✅ Public subnet checklist:
@@ -62,13 +60,10 @@ Subnet group ✅ fastapi-public-subnet-group
 Security group ✅ allow 5432
 
 Step 5: Security Group inbound
-PostgreSQL 5432 My IP
+Postgres SQL 5432 My IP
 Then test connection with test db DONE!
-<<<<<<< HEAD
 
-=======
 # END
->>>>>>> files_to_s3
 
 # using alembic for database migration
 pip install alembic
@@ -98,14 +93,11 @@ alembic history
 
 # in case of any issue, can roll back to previous version
 alembic downgrade -1
-<<<<<<< HEAD
 
-# then after fixing upgrade head again
-=======
 # then after fixing upgrade head again
 
 # Part 16 Uploading files i.e. Profile pics to AWS S3 bucket using boto3
-#TODO in branch dev_fastapi we have code for part 15
+#TODO in branch db_postgres we have code for part 15
 # currently we are using local database from part 14 for testing later we merge that code.
 
 pip install boto3
@@ -125,4 +117,14 @@ In the created user > security credentials > create access keys and save
 we will use that later in config, after that
 
 # Now we change the code
->>>>>>> files_to_s3
+
+#############################
+# Important: When creating db on aws rds, and db_test is working, you see "internal server error"
+then try to do the migration using alembic steps,
+then populate db
+Now db_postgres and files_to_s3 are merged
+DONE!!
+
+#TODO Testing WIP is there in testing_fastapi branch
+# Testing Part 17
+#
