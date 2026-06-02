@@ -12,13 +12,13 @@ from auth import CurrentUser
 
 router = APIRouter()
 
+
 @router.get("",
             response_model=PaginatedPostsResponse)
 async def get_posts(db: Annotated[AsyncSession, Depends(get_db)],
                     skip: Annotated[int, Query(ge=0)] = 0,
                     limit: Annotated[int, Query(ge=1, le=100)] = 10,
                     ):
-
 
     count_result = await db.execute(select(func.count()).select_from(models.Post))
     total_post_count = count_result.scalar() or 0
@@ -75,6 +75,7 @@ async def get_post(post_id: int, db: Annotated[AsyncSession, Depends(get_db)]):
     if post:
         return post
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Post not found")
+
 
 @router.put("/{post_id}",
             response_model=PostResponse)
@@ -136,8 +137,7 @@ async def update_post_partial(
     return post
 
 
-@router.delete("/{post_id}",
-            status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{post_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_post(post_id: int,
                       current_user: CurrentUser,
                       db: Annotated[AsyncSession, Depends(get_db)]):

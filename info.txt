@@ -128,3 +128,53 @@ DONE!!
 #TODO Testing WIP is there in testing_fastapi branch
 # Testing Part 17
 #
+# Part 18
+Deploying application to Virtual server like EC2, linode etc.
+Step 1 Securing the server: applies to any server
+
+sudo usermod -aG sudo ubuntu
+groups ubuntu
+
+Local System
+ssh-keygen -t ed25519 -C "Punit - HP - 24-05-2026"
+give file to save and pass
+/c/Users/punit/.ssh/fastapi_hp
+
+sudo systemctl restart ssh
+ssh-copy-id -i ~/.ssh/fastapi_hp ubuntu@<ip>
+
+cat ~/.ssh/fastapi_hp | ssh -i Key.pem ubuntu@<ip> "mkdir -p ~/.ssh && chmod 700 ~/.ssh && cat >> ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys"
+
+# to add key to ssh agent
+ssh-add ~/.ssh/fastapi_hp
+# below command to run the agent
+eval "$(ssh-agent -s)"
+
+ssh -i ~/.ssh/fastapi_hp.pub ubuntu@<ip>
+chmod 700 ~/.ssh/id_ed25591_fastapi_hp
+
+chmod 700 ~/.ssh
+chmod 600 ~/.ssh/*
+ssh ubuntu@3.93.81.57
+sudo nano /etc/ssh/sshd_config
+
+timedatectl status
+sudo hostnamectl set-hostname fastapi-server
+sudo nano /etc/hosts
+3.93.81.57 fastapi-server
+sudo apt install ufw -y
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+sudo ufw allow ssh
+
+sudo ufw allow 80/tcp
+sudo ufw allow 443/tcp
+sudo ufw enable
+
+sudo ufw status verbose
+
+# fail to ban prevents too many login attempts
+sudo apt install fail2ban -y
+
+# Step 2 specific to our web app
+#TODO Will come later to deploy on EC2 Instances or any VPS
