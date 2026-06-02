@@ -1,3 +1,12 @@
+.git/
+
+tests/
+
+.python-version
+
+
+# Below this came from .gitignore
+
 # Created by https://www.toptal.com/developers/gitignore/api/python,macos,visualstudiocode,dotenv
 # Edit at https://www.toptal.com/developers/gitignore?templates=python,macos,visualstudiocode,dotenv
 
