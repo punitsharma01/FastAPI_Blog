@@ -178,3 +178,22 @@ sudo apt install fail2ban -y
 
 # Step 2 specific to our web app
 #TODO Will come later to deploy on EC2 Instances or any VPS
+
+# Part 19 Deploy application using docker
+# after logging in to ec2 instance
+
+# install docker
+sudo apt update -y
+sudo apt upgrade -y
+sudo apt install -y docker.io git
+
+sudo systemctl enable docker
+sudo systemctl start docker
+sudo usermod -aG docker ubuntu
+sudo systemctl status docker
+
+git clone -b deploy_docker https://github.com/punitsharma01/FastAPI_Blog.git fastapi_blog
+cd fastapi_blog
+
+docker build -t fastapi-app .
+docker run -p 8080:8080 --env-file .env fastapi-app
