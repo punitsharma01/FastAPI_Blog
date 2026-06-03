@@ -15,6 +15,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Install dependencies into a local directory to be copied later
 # Using --user installs into /root/.local/bin and /root/.local/lib
 COPY requirements.txt .
+RUN pip install --upgrade pip
 RUN pip install --no-cache-dir --user -r requirements.txt
 
 # --- PRODUCTION STAGE ---

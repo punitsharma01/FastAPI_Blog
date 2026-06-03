@@ -181,19 +181,114 @@ sudo apt install fail2ban -y
 
 # Part 19 Deploy application using docker
 # after logging in to ec2 instance
+# in this part neon database us used for postgres that scales to zero if no request
 
 # install docker
-sudo apt update -y
+sudo apt update && sudo apt upgrade -y
 sudo apt upgrade -y
 sudo apt install -y docker.io git
+docker --version
 
 sudo systemctl enable docker
 sudo systemctl start docker
 sudo usermod -aG docker ubuntu
+sudo usermod -aG docker $USER
+# to apply changes without restart
+newgrp docker
 sudo systemctl status docker
 
 git clone -b deploy_docker https://github.com/punitsharma01/FastAPI_Blog.git fastapi_blog
 cd fastapi_blog
 
 docker build -t fastapi-app .
-docker run -p 8080:8080 --env-file .env fastapi-app
+docker run -d -p 8080:8080 --env-file .env fastapi-app
+
+# to remove container and images
+docker stop $(docker ps -a -q)
+docker rm $(docker ps -a -q)
+docker rmi $(docker images -a -q)
+
+# to run at Google cloud First Install gcloud cli
+# Docs https://docs.cloud.google.com/sdk/docs/install-sdk#deb
+sudo apt-get update && sudo apt-get upgrade -y
+sudo apt-get install ca-certificates gnupg curl
+
+curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg
+
+echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
+
+sudo apt-get update -y
+sudo apt-get install google-cloud-cli
+
+gcloud --version
+gcloud auth login
+gcloud config set project <PROJECT_ID>
+gcloud config set project fastapi-blog
+# OP: Updated property [core/project].
+
+# List accounts whose credentials are stored on the local system:
+gcloud auth list
+# List the properties in your active gcloud CLI configuration:
+# Verify Project
+gcloud projects list
+gcloud config list
+
+gcloud services enable run.googleapis.com
+# if above command fails check google account and connect billing
+
+gcloud services enable cloudbuild.googleapis.com
+gcloud services enable artifactregistry.googleapis.com
+gcloud services list --enabled
+
+gcloud artifacts repositories create fastapi-repo \
+--repository-format=docker \
+--location=us-east4
+
+# Created repository [fastapi-repo].
+
+## Build and Push to Artifact Registry
+gcloud builds submit \
+    --tag us-east4-docker.pkg.dev/YOUR_PROJECT_ID/fastapi-repo/fastapi-app
+
+## Deploy to Cloud Run
+gcloud run deploy fastapi-service \
+    --image us-east4-docker.pkg.dev/YOUR_PROJECT_ID/fastapi-repo/fastapi-app \
+    --region us-east4 \
+    --allow-unauthenticated
+
+# It will fail, but service is created and env variables needed to provide from env
+# to generate secrete for prod, never use same secrete in diff env
+python3 -c "import secrets; print(secrets.token_hex(16))"
+
+# on google cloud run console: copy
+https://fastapi-service-6806.us-east4.run.app
+
+# Edit and deploy new revision, provide env var values and deploy DONE!!!
+
+# For change of update: code change > build > deploy
+# or build and deploy can combine to one command
+gcloud run deploy fastapi-service --source . --region=us-east4
+
+# Deploying from source requires an Artifact Registry Docker repository to store built containers.
+# A repository named [cloud-run-source-deploy] in
+# region [us-east4] will be created.
+
+# INFO
+If docker file not present, gcloud uses build packs, it detects langauge and build container
+automatically Limited to google
+
+# Cleanup
+# Delete one by one
+gcloud run services delete fastapi-service --region=us-east4
+gcloud run services list
+
+gcloud artifacts repositories delete fastapi-repo --location=us-east4
+gcloud artifacts repositories list
+
+gcloud storage buckets list
+gcloud storage buckets delete gs://PROJECT_ID_cloudbuild
+OR
+gcloud storage rm --recursive gs://PROJECT_ID_cloudbuild
+
+# All at once, It will delete services but project will take 30 days to delete
+gcloud projects delete PROJECT_ID
